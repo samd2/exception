@@ -161,7 +161,7 @@ jobs:
             cxxstd: "98,03,11"
           - name: "TOOLSET=clang COMPILER=clang++ CXXSTD=98,03,1 Job 26"
             buildtype: "boost"
-            packages: "g++-4.9 g++-5 g++-6 clang-3.6 clang-3.7 clang-3.8 ruby-full ninja-build"
+            packages: "g++-4.9 g++-5 g++-6 clang-3.6 clang-3.7 clang-3.8 ruby-full ninja-build clang"
             packages_to_remove: ""
             os: "ubuntu-16.04"
             container: "ubuntu:14.04"
