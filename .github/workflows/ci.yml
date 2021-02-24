@@ -161,7 +161,7 @@ jobs:
             cxxstd: "98,03,11"
           - name: "TOOLSET=clang COMPILER=clang++ CXXSTD=98,03,1 Job 26"
             buildtype: "boost"
-            packages: "g++-4.9 g++-5 g++-6 clang-3.6 clang-3.7 clang-3.8 ruby-full ninja-build clang"
+            packages: "clang"
             packages_to_remove: ""
             os: "ubuntu-16.04"
             container: "ubuntu:14.04"
@@ -331,10 +331,21 @@ jobs:
     container: ${{ matrix.container }}
 
     steps:
-      - uses: actions/checkout@v2
       - name: Check if running in container
         if: matrix.container != ''
         run: echo "GHA_CONTAINER=${{ matrix.container }}" >> $GITHUB_ENV
+      - name: If running in container, upgrade packages
+        if: matrix.container != ''
+        run: |
+            sudo apt-get -o Acquire::Retries=3 update && DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata && apt-get -o Acquire::Retries=3 install -y sudo software-properties-common wget curl apt-transport-https make apt-file sudo unzip libssl-dev build-essential autotools-dev autoconf automake g++ libc++-helpers python python-pip ruby cpio gcc-multilib g++-multilib pkgconf python3 python3-pip ccache libpython-dev
+            git --version || true
+            sudo apt-add-repository ppa:git-core/ppa
+            sudo apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 -y install git
+            git --version || true
+            sudo python -m pip install --upgrade pip==20.3.4
+            sudo /usr/local/bin/pip install cmake
+
+      - uses: actions/checkout@v2
 
       - name: linux
         shell: bash
@@ -356,14 +367,6 @@ jobs:
           TRAVIS_OS_NAME: "linux"
         run: |
           echo '==================================> SETUP'
-          if [ -n "$GHA_CONTAINER" ]; then
-            # if running in a container
-            sudo apt-get -o Acquire::Retries=3 update && DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata && apt-get -o Acquire::Retries=3 install -y sudo software-properties-common wget curl apt-transport-https make apt-file sudo unzip libssl-dev build-essential autotools-dev autoconf automake g++ libc++-helpers python python-pip ruby cpio gcc-multilib g++-multilib pkgconf python3 python3-pip ccache libpython-dev
-            sudo apt-add-repository ppa:git-core/ppa
-            sudo apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 -y install git
-            sudo python -m pip install --upgrade pip==20.3.4
-            sudo /usr/local/bin/pip install cmake
-          fi
           # BOOST_CI_ORG=boostorg BOOST_CI_BRANCH=master && wget https://github.com/$BOOST_CI_ORG/boost-ci/archive/$BOOST_CI_BRANCH.tar.gz && tar -xvf $BOOST_CI_BRANCH.tar.gz && mkdir -p .github &&  mv boost-ci-$BOOST_CI_BRANCH .github/boost-ci
           echo '==================================> PACKAGES'
           set -ex
