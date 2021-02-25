@@ -696,6 +696,7 @@ jobs:
         run: |
           echo '==================================> SETUP'
           set -e
+          sudo mv /Library/Developer/CommandLineTools /Library/Developer/CommandLineTools.bck
           echo '==================================> PACKAGES'
           echo '==================================> INSTALL AND COMPILE'
           set -e
